@@ -13,6 +13,7 @@ default:
     - echo $CI_REGISTRY_PASSWORD | docker login $CI_REGISTRY --username container-registry-rw --password-stdin
 
 build-frontend:
+  stage: build
   script:
     - cd frontend
     - docker pull $FRONTEND_IMAGE:latest || true
@@ -20,6 +21,7 @@ build-frontend:
     - docker push $FRONTEND_IMAGE --all-tags
 
 build-backend:
+  stage: build
   script:
     - cd node-api
     - docker pull $BACKEND_IMAGE:latest || true
