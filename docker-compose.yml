@@ -9,7 +9,7 @@ services:
     working_dir: /e2e
     volumes:
       - ./frontend:/e2e
-    entrypoint: cypress run --config baseUrl=http://frontend --headless --browser chrome
+    entrypoint: cypress run --config baseUrl=http://frontend --headless --browser chrome -C cypress.config.js
     depends_on:
       - frontend
       - node-api
