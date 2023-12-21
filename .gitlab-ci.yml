@@ -65,3 +65,11 @@ build-backend:
     - docker pull $BACKEND_IMAGE:latest || true
     - docker build --cache-from $BACKEND_IMAGE:latest -t $BACKEND_IMAGE:$CI_COMMIT_SHORT_SHA -t $BACKEND_IMAGE:latest .
     - docker push $BACKEND_IMAGE --all-tags
+
+test_e2e:
+  stage: e2e
+  <<: *container_registry
+  script:
+    - docker compose up --exit-code-from cypress --abort-on-container-exit
+  after_script:
+    - docker compose down -v --remove-orphans

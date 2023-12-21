@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  node-api:
+    image: $BACKEND_IMAGE
+  frontend:
+    image: $FRONTEND_IMAGE
+  cypress:
+    image: cypress/included
+    working_dir: /e2e
+    volumes:
+      - ./frontend:/e2e
+    entrypoint: cypress run --config baseUrl=http://frontend --headless --browser chrome
+    depends_on:
+      - frontend
+      - node-api
