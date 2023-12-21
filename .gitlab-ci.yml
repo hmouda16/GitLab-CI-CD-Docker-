@@ -1,19 +1,56 @@
 stages:
+  - test
   - build
+  - e2e
 
 variables:
   FRONTEND_IMAGE: $CI_REGISTRY_IMAGE/frontend
   BACKEND_IMAGE: $CI_REGISTRY_IMAGE/node-api
 
-default:
+.container_registry: &container_registry
   image: docker
   services:
     - docker:dind
   before_script:
     - echo $CI_REGISTRY_PASSWORD | docker login $CI_REGISTRY --username container-registry-rw --password-stdin
 
-build-frontend:
+test_frontend:
+  image: node:lts-bullseye
+  stage: test
+  cache:
+    key:
+      files:
+        - 'frontend/package-lock.json'
+    paths:
+      - frontend/node_modules
+      - frontend/.npm
+  script:
+    - cd frontend
+    - npm ci --cache .npm --prefer-offline
+    - npm run lint
+    - npm audit
+
+test_backend:
+  image: node:lts-bullseye
+  stage: test
+  cache:
+    key:
+      files:
+        - 'node-api/package-lock.json'
+    paths:
+      - node-api/node_modules
+      - node-api/.npm
+  script:
+    - cd node-api
+    - npm ci --cache .npm --prefer-offline
+    - npm run lint
+    - npm audit
+    - npm run test:ci
+  coverage: '/All files[^]]*\|[^]]*\s+([\d\.]+)/'
+
+build-frontend: 
   stage: build
+  <<: *container_registry
   script:
     - cd frontend
     - docker pull $FRONTEND_IMAGE:latest || true
@@ -22,6 +59,7 @@ build-frontend:
 
 build-backend:
   stage: build
+  <<: *container_registry
   script:
     - cd node-api
     - docker pull $BACKEND_IMAGE:latest || true
