@@ -1,9 +1,9 @@
 version: "3.9"
 services:
   node-api:
-    image: $BACKEND_IMAGE
+    image: node:lts-bullseye
   frontend:
-    image: $FRONTEND_IMAGE
+    image: node:lts-bullseye
   cypress:
     image: cypress/included
     working_dir: /e2e
