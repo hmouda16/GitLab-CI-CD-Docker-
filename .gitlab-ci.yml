@@ -2,10 +2,13 @@ stages:
   - test
   - build
   - e2e
+  - deploy
 
 variables:
   FRONTEND_IMAGE: $CI_REGISTRY_IMAGE/frontend
   BACKEND_IMAGE: $CI_REGISTRY_IMAGE/node-api
+  SERVER_PROD_IP: 5.196.1.111
+  SERVER_PROD_USER: root
 
 .container_registry: &container_registry
   image: docker
@@ -73,3 +76,24 @@ test_e2e:
     - docker compose up --exit-code-from cypress --abort-on-container-exit
   after_script:
     - docker compose down -v --remove-orphans
+  
+deploy:
+  stage: deploy
+  image: alpine
+  environment:
+    name: production
+  before_script:
+    - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$GITLAB_KEY_PRODUCTION" | ssh-add -
+  script:
+    - mkdir -p ~/.ssh
+    - touch ~/.ssh/known_hosts
+    - ssh-keyscan -H $SERVER_PROD_IP >> ~/.ssh/known_hosts
+    - ssh $SERVER_PROD_USER@$SERVER_PROD_IP 'echo $CI_REGISTRY_PASSWORD | docker login $CI_REGISTRY --username container-registry-rw --password-stdin'
+    - scp docker-compose.prod.yml $SERVER_PROD_USER@$SERVER_PROD_IP:/root/docker-compose.prod.yml
+    - ssh $SERVER_PROD_USER@$SERVER_PROD_IP 'docker compose up -d --force-recreate
+
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  
