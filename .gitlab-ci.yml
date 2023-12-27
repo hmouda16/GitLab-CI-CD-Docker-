@@ -82,6 +82,8 @@ deploy:
   image: alpine
   environment:
     name: production
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH 
   before_script:
     - apk add --no-cache openssh-client
     - eval $(ssh-agent -s)
@@ -90,10 +92,12 @@ deploy:
     - mkdir -p ~/.ssh
     - touch ~/.ssh/known_hosts
     - ssh-keyscan -H $SERVER_PROD_IP >> ~/.ssh/known_hosts
-    - ssh -T $SERVER_PROD_USER@$SERVER_PROD_IP 'echo $CI_REGISTRY_PASSWORD | docker login $CI_REGISTRY --username container-registry-rw --password-stdin'
-    - scp docker-compose.prod.yml $SERVER_PROD_USER@$SERVER_PROD_IP:/root/docker-compose.prod.yml
-    - ssh $SERVER_PROD_USER@$SERVER_PROD_IP 'BACKEND_IMAGE=$BACKEND_IMAGE FRONTEND_IMAGE=$FRONTEND_IMAGE docker compose -f docker-compose.prod.yml up -d --force-recreate
-
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - scp docker-compose.prod.yml root@$SERVER_PROD_IP:/root/docker-compose.prod.yml
+     ssh root@$SERVER_PRODUCTION "
+      docker login $CI_REGISTRY -u container-registry-rw -p $CI_REGISTRY_PASSWORD &&
+      docker pull $FRONTEND_IMAGE:latest &&
+      docker pull $BACKEND_IMAGE:latest &&
+      docker compose -f docker-compose.prod.yml up -d --force-recreate
+      "
+  
   
