@@ -3,7 +3,7 @@ services:
   node-api:
     image: $BACKEND_IMAGE
     environment:
-      - NODE_ENV=production
+      NODE_ENV: production
     deploy:
       replicas: 3
       update_config:
