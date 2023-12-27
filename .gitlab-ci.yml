@@ -94,8 +94,8 @@ deploy:
     - ssh-keyscan -H $SERVER_PROD_IP >> ~/.ssh/known_hosts
     - scp docker-compose.prod.yml root@$SERVER_PROD_IP:/root/docker-compose.prod.yml
     - ssh root@$SERVER_PROD_IP "docker login $CI_REGISTRY -u container-registry-rw -p $CI_REGISTRY_PASSWORD &&
-      docker pull node:lts-bullseye &&
-      docker pull node:lts-bullseye &&
+      docker pull $FRONTEND_IMAGE:latest &&
+      docker pull $BACKEND_IMAGE:latest &&
       docker compose -f docker-compose.prod.yml up -d --force-recreate"
   
   
