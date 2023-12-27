@@ -93,8 +93,7 @@ deploy:
     - touch ~/.ssh/known_hosts
     - ssh-keyscan -H $SERVER_PROD_IP >> ~/.ssh/known_hosts
     - scp docker-compose.prod.yml root@$SERVER_PROD_IP:/root/docker-compose.prod.yml
-    - ssh root@$SERVER_PROD_IP "echo $CI_REGISTRY_PASSWORD |
-      docker login $CI_REGISTRY -u container-registry-rw -p $CI_REGISTRY_PASSWORD \
+    - ssh SERVER_PROD_USER@$SERVER_PROD_IP "echo $CI_REGISTRY_PASSWORD | docker login $CI_REGISTRY --username container-registry-rw --password-stdin \
       && docker pull $FRONTEND_IMAGE \
       && docker pull $BACKEND_IMAGE \
       && docker-compose -f docker-compose.prod.yml up -d --force-recreate"
