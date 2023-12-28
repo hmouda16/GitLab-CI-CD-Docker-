@@ -1,5 +1,4 @@
 .deploy_common:
-  deploy_staging:
   stage: deploy
   image: alpine
   environment:
