@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   node-api:
-    image: registry.gitlab.com/dyma705836/cicd-projet1/node-api
+    image: node:lts-bullseye
     environment:
       NODE_ENV: production
     deploy:
@@ -12,7 +12,7 @@ services:
       restart_policy:
         condition: on-failure
   frontend:
-    image: registry.gitlab.com/dyma705836/cicd-projet1/frontend
+    image: node:lts-bullseye
     ports:
       - target: 80
         published: 80
