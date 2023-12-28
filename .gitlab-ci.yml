@@ -6,6 +6,7 @@ stages:
   - build
   - e2e
   - deploy
+  - deploy_staging
 
 variables:
   FRONTEND_IMAGE: $CI_REGISTRY_IMAGE/frontend
