@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   node-api:
-    image: node:lts-bullseye
+    image: registry.gitlab.com/hmouda161/gitlab-projet2-docker/node-api
     environment:
       NODE_ENV: production
     deploy:
@@ -12,7 +12,7 @@ services:
       restart_policy:
         condition: on-failure
   frontend:
-    image: node:lts-bullseye
+    image: registry.gitlab.com/hmouda161/gitlab-projet2-docker/frontend
     ports:
       - target: 80
         published: 80
